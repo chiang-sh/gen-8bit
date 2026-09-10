@@ -1,12 +1,12 @@
-use image::{DynamicImage, GenericImage, GenericImageView, Rgba};
+use image::{DynamicImage, GenericImage, GenericImageView, ImageError, Rgba};
 use std::path::Path;
 
 const PIXEL_SIZE: u32 = 8;
 const PALETTE_SIZE: usize = 16;
 
-pub fn gen_8bit(src_path: &str, dest_path: &str) {
+pub fn gen_8bit(src_path: &str, dest_path: &str) -> Result<(), ImageError> {
     let src_path = Path::new(src_path);
-    let src_image = image::open(src_path).unwrap();
+    let src_image = image::open(src_path)?;
     let downscale_image = resize(
         &src_image,
         src_image.width() / PIXEL_SIZE,
@@ -18,7 +18,8 @@ pub fn gen_8bit(src_path: &str, dest_path: &str) {
         src_image.height(),
     );
     let dest_path = Path::new(dest_path);
-    dest_image.save(dest_path);
+    dest_image.save(dest_path)?;
+    Ok(())
 }
 
 fn resize(src_image: &DynamicImage, dest_w: u32, dest_h: u32) -> DynamicImage {
