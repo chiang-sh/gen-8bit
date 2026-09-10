@@ -1,9 +1,26 @@
+//! A small tool for converting images to an 8-bit pixel art style.
 use image::{ImageError, Rgba, RgbaImage};
 use std::path::Path;
 
 const PIXEL_SIZE: u32 = 8;
 const PALETTE_SIZE: usize = 16;
 
+/// Convert original image to an 8-bit pixel art style
+/// 
+/// The image would be downscaled, color quantized, and upscaled to its original size to achieve an 8-bit style effect.
+/// 
+/// # Arguments
+/// 
+/// * `src_path`: Path to the source image file.
+/// * `dest_path`: Path to the destination image file.
+/// 
+/// # Errors
+/// Returns `ImageError` when image processing errors occur.
+/// 
+/// # Example
+/// ```
+/// gen_8bit::gen_8bit("test_src.png", "test_dest.png")?;
+/// ```
 pub fn gen_8bit(src_path: &str, dest_path: &str) -> Result<(), ImageError> {
     let src_path = Path::new(src_path);
     let src_image = image::open(src_path)?.to_rgba8();
