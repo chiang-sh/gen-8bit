@@ -1,4 +1,4 @@
-use image::{DynamicImage, GenericImage, GenericImageView, ImageError, Rgba};
+use image::{ImageError, Rgba, RgbaImage};
 use std::path::Path;
 
 const PIXEL_SIZE: u32 = 8;
@@ -6,7 +6,7 @@ const PALETTE_SIZE: usize = 16;
 
 pub fn gen_8bit(src_path: &str, dest_path: &str) -> Result<(), ImageError> {
     let src_path = Path::new(src_path);
-    let src_image = image::open(src_path)?;
+    let src_image = image::open(src_path)?.to_rgba8();
     let downscale_image = resize(
         &src_image,
         src_image.width() / PIXEL_SIZE,
@@ -22,23 +22,22 @@ pub fn gen_8bit(src_path: &str, dest_path: &str) -> Result<(), ImageError> {
     Ok(())
 }
 
-fn resize(src_image: &DynamicImage, dest_w: u32, dest_h: u32) -> DynamicImage {
-    let mut dest_image = DynamicImage::new(dest_w, dest_h, src_image.color());
+fn resize(src_image: &RgbaImage, dest_w: u32, dest_h: u32) -> RgbaImage {
+    let mut dest_image = RgbaImage::new(dest_w, dest_h);
     for x in 0..dest_image.width() {
         for y in 0..dest_image.height() {
             let src_x = x * src_image.width() / dest_image.width();
             let src_y = y * src_image.height() / dest_image.height();
             let pixel = src_image.get_pixel(src_x, src_y);
-            dest_image.put_pixel(x, y, pixel);
+            dest_image.put_pixel(x, y, *pixel);
         }
     }
     dest_image
 }
 
-fn color_quantization(src_image: DynamicImage) -> DynamicImage {
+fn color_quantization(src_image: RgbaImage) -> RgbaImage {
     let palette = median_cut(&src_image);
-    let mut dest_image =
-        DynamicImage::new(src_image.width(), src_image.height(), src_image.color());
+    let mut dest_image = RgbaImage::new(src_image.width(), src_image.height());
     for x in 0..dest_image.width() {
         for y in 0..dest_image.height() {
             let src_rgba = src_image.get_pixel(x, y);
@@ -64,13 +63,10 @@ fn color_quantization(src_image: DynamicImage) -> DynamicImage {
     dest_image
 }
 
-fn median_cut(image: &DynamicImage) -> Vec<[u8; 3]> {
+fn median_cut(image: &RgbaImage) -> Vec<[u8; 3]> {
     let pixels = image.pixels();
-    let mut groups: Vec<Vec<[u8; 3]>> = vec![
-        pixels
-            .map(|(_, _, rgba)| [rgba[0], rgba[1], rgba[2]])
-            .collect(),
-    ];
+    let mut groups: Vec<Vec<[u8; 3]>> =
+        vec![pixels.map(|rgba| [rgba[0], rgba[1], rgba[2]]).collect()];
 
     while groups.len() < PALETTE_SIZE {
         let mut group = groups.remove(0);
