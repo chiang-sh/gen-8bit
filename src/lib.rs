@@ -48,7 +48,7 @@ fn color_quantization(src_image: RgbaImage) -> RgbaImage {
                 let dist_g = src_rgba.0[1] as i32 - rgb[1] as i32;
                 let dist_b = src_rgba.0[2] as i32 - rgb[2] as i32;
                 let dist = dist_r * dist_r + dist_g * dist_g + dist_b * dist_b;
-                if (dist < nearest_dist) {
+                if dist < nearest_dist {
                     nearest_dist = dist;
                     nearest_rgb = *rgb;
                 }
@@ -56,7 +56,7 @@ fn color_quantization(src_image: RgbaImage) -> RgbaImage {
             dest_image.put_pixel(
                 x,
                 y,
-                Rgba([nearest_rgb[0], nearest_rgb[1], nearest_rgb[2], 255]),
+                Rgba([nearest_rgb[0], nearest_rgb[1], nearest_rgb[2], src_rgba[3]]),
             );
         }
     }
@@ -86,14 +86,14 @@ fn median_cut(image: &RgbaImage) -> Vec<[u8; 3]> {
             max_b = max_b.max(rgb[2]);
         }
 
-        let diff = vec![max_r - min_r, max_g - min_g, max_b - min_b];
+        let diff = [max_r - min_r, max_g - min_g, max_b - min_b];
         let max_channel = diff
             .iter()
             .enumerate()
             .max_by_key(|(_, val)| **val)
             .map(|(index, _)| index)
             .unwrap();
-        group.sort_by_key(|rgb| rgb[max_channel]);
+        group.sort_unstable_by_key(|rgb| rgb[max_channel]);
         let half = group.split_off(group.len() / 2);
         groups.push(half);
         groups.push(group);
@@ -125,6 +125,6 @@ mod tests {
 
     #[test]
     fn test_gen_8bit() {
-        gen_8bit("", "");
+        gen_8bit("", "").unwrap();
     }
 }
