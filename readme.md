@@ -10,8 +10,8 @@ See the documentation for a usage example.
 5. Save the processed image to the specified path.
 
 # Results
-<img width="704" height="232" alt="result1" src="https://github.com/user-attachments/assets/a488f15c-248e-40b7-8251-441158af6dc9" />
-<img width="704" height="525" alt="result2" src="https://github.com/user-attachments/assets/62e8dfd4-411a-49f6-a1f0-55789f498d16" />
+<img width="761" height="253" alt="result1" src="https://github.com/user-attachments/assets/f982c5d9-456d-4d6d-a258-c71f9bd25ee3" />
+<img width="761" height="564" alt="result2" src="https://github.com/user-attachments/assets/3ed77721-5846-458d-88f2-ac4d5ba9ee10" />
 
 # References
 * https://web.ntnu.edu.tw/~algo/Image.html
